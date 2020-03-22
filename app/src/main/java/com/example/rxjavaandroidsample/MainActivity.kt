@@ -10,8 +10,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var myObservable: Observable<Array<String>>
-    private lateinit var myObserver: Observer<Array<String>>
+    private lateinit var myObservable: Observable<String>
+    private lateinit var myObserver: Observer<String>
     private val greetings =  arrayOf("Hello RxAndroid", "Hello Rx Java", "Hello Android")
     private val TAG = "MainActivity"
 
@@ -19,16 +19,16 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.just(greetings)
+        myObservable = Observable.just("Hello", "Hello RX", "Hello Rx Android")
 
-        myObserver = object: Observer<Array<String>>{
+        myObserver = object: Observer<String>{
 
             override fun onSubscribe(d: Disposable?) {
                 Log.v(TAG, "onSubscribe")
             }
-            override fun onNext(t: Array<String>?) {
+            override fun onNext(t: String?) {
                 Log.v(TAG, "onNext: $t")
-                textview1.text = t!!.size.toString()
+                textview1.text = t
             }
             override fun onError(e: Throwable?) {
                 Log.v(TAG, "onError: " + e.toString())
