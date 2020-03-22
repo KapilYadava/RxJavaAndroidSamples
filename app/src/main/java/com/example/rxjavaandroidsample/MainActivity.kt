@@ -16,9 +16,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(){
 
     private lateinit var myObservable: Observable<String>
-    private lateinit var myObserver: DisposableObserver<String>
-    private lateinit var myObserver2: DisposableObserver<String>
-    private val greetings = "Hello RxAndroid"
+    private val greetings = listOf("Hello A", "Hello B", "Hello C")
     private val TAG = "MainActivity"
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -26,13 +24,24 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.just(greetings)
+        myObservable = Observable.fromIterable(greetings)
 
-        myObserver = object: DisposableObserver<String>() {
+        compositeDisposable.apply {
+            add(myObservable.subscribeWith(getObserver()))
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.clear()
+    }
+
+    private fun getObserver(): DisposableObserver<String>{
+        return object: DisposableObserver<String>() {
 
             override fun onNext(t: String?) {
                 Log.v(TAG, "onNext: $t")
-                textview1.text = t
+                //textview1.text = t
             }
             override fun onError(e: Throwable?) {
                 Log.v(TAG, "onError: " + e.toString())
@@ -41,35 +50,5 @@ class MainActivity : AppCompatActivity(){
                 Log.v(TAG, "onComplete")
             }
         }
-
-        myObserver2 = object: DisposableObserver<String>() {
-
-            override fun onNext(t: String?) {
-                Log.v(TAG, "onNext: $t")
-                textview1.text = t
-            }
-            override fun onError(e: Throwable?) {
-            }
-            override fun onComplete() {
-                Log.v(TAG, "onComplete")
-            }
-        }
-
-//        compositeDisposable.add(myObserver)
-//        compositeDisposable.add(myObserver2)
-//        myObservable.subscribe(myObserver)
-//        myObservable.subscribe(myObserver2)
-
-        compositeDisposable.apply {
-            add(myObservable.subscribeWith(myObserver))
-            add(myObservable.subscribeWith(myObserver2))
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //myObserver.dispose()
-        //myObserver2.dispose()
-        compositeDisposable.clear()
     }
 }
