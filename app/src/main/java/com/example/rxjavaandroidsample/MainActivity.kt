@@ -3,11 +3,14 @@ package com.example.rxjavaandroidsample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.observers.DisposableObserver
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(){
@@ -46,17 +49,21 @@ class MainActivity : AppCompatActivity(){
                 textview1.text = t
             }
             override fun onError(e: Throwable?) {
-                Log.v(TAG, "onError: " + e.toString())
             }
             override fun onComplete() {
                 Log.v(TAG, "onComplete")
             }
         }
 
-        compositeDisposable.add(myObserver)
-        compositeDisposable.add(myObserver2)
-        myObservable.subscribe(myObserver)
-        myObservable.subscribe(myObserver2)
+//        compositeDisposable.add(myObserver)
+//        compositeDisposable.add(myObserver2)
+//        myObservable.subscribe(myObserver)
+//        myObservable.subscribe(myObserver2)
+
+        compositeDisposable.apply {
+            add(myObservable.subscribeWith(myObserver))
+            add(myObservable.subscribeWith(myObserver2))
+        }
     }
 
     override fun onDestroy() {
