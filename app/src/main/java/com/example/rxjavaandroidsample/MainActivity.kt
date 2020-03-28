@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.observers.DisposableObserver
 
 class MainActivity : AppCompatActivity(){
@@ -28,10 +29,20 @@ class MainActivity : AppCompatActivity(){
 
         compositeDisposable.apply {
             add(myObservable
-                .map { s ->
-                    val employee = Employee(s.name, s.age)
-                    employee
-                }
+//                .map(object : Function<Student, Employee> {
+//                override fun apply(s: Student): Employee {
+//                    val employee = Employee(s.name, s.age)
+//                    return employee
+//                    }
+//                })
+                .flatMap(object : Function<Student, Observable<Employee>>{
+                    override fun apply(s: Student): Observable<Employee> {
+                        val employee1 = Employee("new member", 22)
+                        val employee2 = Employee("new member2", 2)
+                        val employee = Employee(s.name, s.age)
+                        return Observable.just(employee, employee1, employee2)
+                    }
+                })
                 .subscribeWith(getObserver()))
         }
     }
