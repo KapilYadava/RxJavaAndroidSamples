@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.observers.DisposableObserver
 
 class MainActivity : AppCompatActivity(){
@@ -21,18 +20,14 @@ class MainActivity : AppCompatActivity(){
 
         myObservable = Observable.range(1, 20)
         myObservable
-            .buffer(4)
-            .subscribe(object : Observer<List<Int>> {
-                override fun onSubscribe(d: Disposable?) {
-                   Log.v(TAG, "onSubscribe: $d")
+            .filter(object : Predicate<Int>{
+                override fun test(t: Int): Boolean {
+                    return t%3 == 0
                 }
-
-                override fun onNext(t: List<Int>) {
+            })
+            .subscribe(object : DisposableObserver<Int>() {
+                override fun onNext(t: Int) {
                     Log.v(TAG, "onNext: $t")
-
-                    for (i in t){
-                        Log.v(TAG, "onNext: $i")
-                    }
                 }
 
                 override fun onError(e: Throwable?) {
