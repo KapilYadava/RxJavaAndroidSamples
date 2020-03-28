@@ -17,9 +17,10 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.just(1, 2, 3, 3, 3 , 4, 5, 1, 5)
+        myObservable = Observable.just(1, 2, 3, 3, 3, 3 , 4, 5, 1, 5)
         myObservable
-            .distinct()
+            //.skip(6)
+            .skipLast(4)
             .subscribe(object : DisposableObserver<Int>() {
                 override fun onNext(t: Int) {
                     Log.v(TAG, "onNext: $t")
