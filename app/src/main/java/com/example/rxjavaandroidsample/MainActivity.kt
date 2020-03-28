@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.observers.DisposableObserver
 
 class MainActivity : AppCompatActivity(){
@@ -18,13 +17,9 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.range(1, 20)
+        myObservable = Observable.just(1, 2, 3, 3, 3 , 4, 5, 1, 5)
         myObservable
-            .filter(object : Predicate<Int>{
-                override fun test(t: Int): Boolean {
-                    return t%3 == 0
-                }
-            })
+            .distinct()
             .subscribe(object : DisposableObserver<Int>() {
                 override fun onNext(t: Int) {
                     Log.v(TAG, "onNext: $t")
