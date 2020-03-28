@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(){
 //                    return employee
 //                    }
 //                })
-                .flatMap(object : Function<Student, Observable<Employee>>{
+                .concatMap(object : Function<Student, Observable<Employee>>{
                     override fun apply(s: Student): Observable<Employee> {
                         val employee1 = Employee("new member", 22)
                         val employee2 = Employee("new member2", 2)
