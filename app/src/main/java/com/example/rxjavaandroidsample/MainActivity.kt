@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.ObservableOnSubscribe
+import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.functions.Function
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.observers.DisposableObserver
 
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var myObservable: Observable<Student>
+    private lateinit var myObservable: Observable<Int>
     private val TAG = "MainActivity"
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -19,37 +19,36 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.create(ObservableOnSubscribe { emitter->
-            val students = getStudents();
-            for(s in students){
-                emitter.onNext(s)
-            }
-            emitter.onComplete()
-        })
+        myObservable = Observable.range(1, 20)
+        myObservable
+            .buffer(4)
+            .subscribe(object : Observer<List<Int>> {
+                override fun onSubscribe(d: Disposable?) {
+                   Log.v(TAG, "onSubscribe: $d")
+                }
 
-        compositeDisposable.apply {
-            add(myObservable
-//                .map(object : Function<Student, Employee> {
-//                override fun apply(s: Student): Employee {
-//                    val employee = Employee(s.name, s.age)
-//                    return employee
-//                    }
-//                })
-                .concatMap(object : Function<Student, Observable<Employee>>{
-                    override fun apply(s: Student): Observable<Employee> {
-                        val employee1 = Employee("new member", 22)
-                        val employee2 = Employee("new member2", 2)
-                        val employee = Employee(s.name, s.age)
-                        return Observable.just(employee, employee1, employee2)
+                override fun onNext(t: List<Int>) {
+                    Log.v(TAG, "onNext: $t")
+
+                    for (i in t){
+                        Log.v(TAG, "onNext: $i")
                     }
-                })
-                .subscribeWith(getObserver()))
-        }
+                }
+
+                override fun onError(e: Throwable?) {
+                    Log.v(TAG, "onError: $e")
+                }
+
+                override fun onComplete() {
+                    Log.v(TAG, "onComplete")
+                }
+            })
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        compositeDisposable.clear()
+        //compositeDisposable.clear()
     }
 
     private fun getObserver(): DisposableObserver<Employee> {
