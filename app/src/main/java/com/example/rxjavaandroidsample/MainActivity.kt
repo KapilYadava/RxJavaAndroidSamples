@@ -1,22 +1,16 @@
 package com.example.rxjavaandroidsample
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.observers.DisposableObserver
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var myObservable: Observable<Int>
-    private val greetings = listOf("Hello A", "Hello B", "Hello C")
+    private lateinit var myObservable: Observable<Student>
     private val TAG = "MainActivity"
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -24,7 +18,13 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myObservable = Observable.range(1, 30)
+        myObservable = Observable.create(ObservableOnSubscribe { emitter->
+            val students = getStudents();
+            for(s in students){
+                emitter.onNext(s)
+            }
+            emitter.onComplete()
+        })
 
         compositeDisposable.apply {
             add(myObservable.subscribeWith(getObserver()))
@@ -36,10 +36,10 @@ class MainActivity : AppCompatActivity(){
         compositeDisposable.clear()
     }
 
-    private fun getObserver(): DisposableObserver<Int> {
-        return object : DisposableObserver<Int>() {
+    private fun getObserver(): DisposableObserver<Student> {
+        return object : DisposableObserver<Student>() {
 
-            override fun onNext(t: Int?) {
+            override fun onNext(t: Student?) {
                 Log.v(TAG, "onNext: $t")
                 //textview1.text = t
             }
@@ -50,5 +50,25 @@ class MainActivity : AppCompatActivity(){
                 Log.v(TAG, "onComplete")
             }
         }
+    }
+
+    private fun getStudents() : List<Student>{
+        val list = ArrayList<Student>()
+        var student = Student("Kapil", "Kapilyadava.isa@gmail.com", 32)
+        list.add(student)
+
+        student = Student("Takshii", "Takshiiyadava.isa@gmail.com", 2)
+        list.add(student)
+
+        student = Student("Alka", "alkayadava.isa@gmail.com", 28)
+        list.add(student)
+
+        student = Student("Mahendra", "mahendrasingh.isa@gmail.com", 65)
+        list.add(student)
+
+        student = Student("Santresh", "santresh.devi66@gmail.com", 62)
+        list.add(student)
+
+        return list
     }
 }
