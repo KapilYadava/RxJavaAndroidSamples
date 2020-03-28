@@ -27,7 +27,12 @@ class MainActivity : AppCompatActivity(){
         })
 
         compositeDisposable.apply {
-            add(myObservable.subscribeWith(getObserver()))
+            add(myObservable
+                .map { s ->
+                    val employee = Employee(s.name, s.age)
+                    employee
+                }
+                .subscribeWith(getObserver()))
         }
     }
 
@@ -36,10 +41,10 @@ class MainActivity : AppCompatActivity(){
         compositeDisposable.clear()
     }
 
-    private fun getObserver(): DisposableObserver<Student> {
-        return object : DisposableObserver<Student>() {
+    private fun getObserver(): DisposableObserver<Employee> {
+        return object : DisposableObserver<Employee>() {
 
-            override fun onNext(t: Student?) {
+            override fun onNext(t: Employee?) {
                 Log.v(TAG, "onNext: $t")
                 //textview1.text = t
             }
